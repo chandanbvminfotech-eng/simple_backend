@@ -3,6 +3,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config({
   path: "./.env",
+  quiet: true,
 });
 
 cloudinary.config({
@@ -19,9 +20,8 @@ const uploadOnCloudinary = async (localFilePath) => {
       resource_type: "auto",
     });
 
-    console.log("✅ Uploaded to Cloudinary:", response.url);
+    console.log("Uploaded to Cloudinary:", response.url);
 
-    // ✅ delete file after success
     if (fs.existsSync(localFilePath)) {
       fs.unlinkSync(localFilePath);
     }
@@ -33,10 +33,10 @@ const uploadOnCloudinary = async (localFilePath) => {
       fs.unlinkSync(localFilePath);
     }
 
-    console.error("❌ Cloudinary upload error:", err);
+    console.error("Cloudinary upload error:", err);
     return null;
   }
 };
-
+ 
 
 export { uploadOnCloudinary };

@@ -1,6 +1,8 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import dotenv from "dotenv";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 dotenv.config({
   path: "./.env",
   quiet: true,
@@ -37,6 +39,28 @@ const uploadOnCloudinary = async (localFilePath) => {
     return null;
   }
 };
- 
 
-export { uploadOnCloudinary };
+const deleteFromCloudinary = async (databaseFilePath) => {
+  try {
+    if (!databaseFilePath) {
+      throw new ApiError(400, "Please provide a file path to delete");
+    }
+    const spreadedUrl = databaseFilePath.split("/");
+    const getPublicId = spreadedUrl[spreadedUrl.length - 1];
+    const publicId = getPublicId.split(".")[0];
+
+    const response = await cloudinary.uploader.destroy(publicId);
+
+    console.log("Deleted from cloudinary");
+
+    if (fs.existsSync(databaseFilePath)) {
+      fs.unlinkSync(databaseFilePath);
+    }
+    return response;
+  } catch (err) {
+    console.error("Cloudinary upload error:", err);
+    return null;
+  }
+};
+
+export { uploadOnCloudinary,deleteFromCloudinary };
